@@ -8,13 +8,17 @@ function checkCode(code) {
   }
 }
 
+function getNodeBinItem(name) {
+  return path.resolve(".", "node_modules", ".bin", name + (process.platform === "win32" ? ".cmd" : ""));
+}
+
 var options = {
   stdio: 'inherit', stderr: 'inherit'
 }
 
-child_process.spawn(path.resolve(".", "node_modules", '.bin', 'tsd'), ["install"], options)
+child_process.spawn(getNodeBinItem('tsd'), ["install"], options)
   .on('close', function(code) {
     checkCode(code);
-    child_process.spawn(path.resolve(".", "node_modules", '.bin', 'tsc'), options)
+    child_process.spawn(getNodeBinItem('tsc'), options)
       .on('close', checkCode);
   });
