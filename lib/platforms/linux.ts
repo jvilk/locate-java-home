@@ -10,7 +10,7 @@ var exec = child_process.exec;
  * - the JAVA_HOME environment variable
  * - Java on the PATH.
  */
-export function linuxFindJavaHome(cb: (homes: string[], executableExtension?: string) => void): void {
+export = function linuxFindJavaHome(cb: (homes: string[], executableExtension?: string) => void): void {
   var discoveredJavaHomes: string[] = [];
   // Option 1: Try the 'update-java-alternatives' tool
   exec('update-java-alternatives -l', (err: Error, stdout: Buffer, stderr: Buffer) => {

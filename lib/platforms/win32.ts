@@ -7,7 +7,7 @@ var spawn = child_process.spawn;
 /**
  * Find Java on Windows by checking registry keys.
  */
-export function windowsFindJavaHome(cb: (homes: string[], executableExtension?: string) => void): void {
+export = function windowsFindJavaHome(cb: (homes: string[], executableExtension?: string) => void): void {
   // Windows: JDK path is in either of the following registry keys:
   // - HKLM\Software\JavaSoft\Java Development Kit\1.[version] [JDK arch == OS arch]
   // - HKLM\Software\Wow6432Node\JavaSoft\Java Development Kit\1.[version] [32-bit JDK Arch, 64-bit OS arch]
