@@ -89,6 +89,7 @@ function getRegistryKey(key: string, cb: (err: Error, values?: IKeyInfo) => void
           // rv[valName] = value;
           // Second item is the type; we don't care about that.
           rv[match[1].trim()] = match[3];
+          asyncCb();
         } else if (item.slice(0, 4) === "HKEY") {
           // It's a HKEY_[etc]\ path. Recursively expand!
           getRegistryKey(item.trim(), (err, vals) => {
