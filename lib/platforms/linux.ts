@@ -38,7 +38,7 @@ export = function linuxFindJavaHome(cb: (homes: string[], executableExtension?: 
         // Find JAVA_HOME for Java.
         exec(`which java`, function(err: Error, stdout: Buffer, stderr: Buffer) {
           if (!err) {
-            var javaPath = stdout.toString();
+            var javaPath = stdout.toString().trim();
             // Trace path.
             try {
               while (1) {
