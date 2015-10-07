@@ -4,14 +4,16 @@
         "inlineSourceMap": true,
         "inlineSources": true,
         "noImplicitAny": true,
-        "declaration": true
+        "declaration": true,
+        "outDir": "js"
     },
     "files": [
-        "index.ts",
-        "lib/locate_java_home.ts",
-        "lib/interfaces.ts",
-        "lib/platforms/linux.ts",
-        "lib/platforms/darwin.ts",
-        "lib/platforms/win32.ts"
+        "typings/tsd.d.ts",
+        "ts/index.ts",
+        "ts/lib/locate_java_home.ts",
+        "ts/lib/interfaces.ts",
+        "ts/lib/platforms/linux.ts",
+        "ts/lib/platforms/darwin.ts",
+        "ts/lib/platforms/win32.ts"
     ]
 }

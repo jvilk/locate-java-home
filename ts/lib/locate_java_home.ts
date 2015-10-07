@@ -1,6 +1,3 @@
-/// <reference path="../typings/node/node.d.ts" />
-/// <reference path="../typings/semver/semver.d.ts" />
-/// <reference path="../typings/async/async.d.ts" />
 import path = require('path');
 import fs = require('fs');
 import child_process = require('child_process');

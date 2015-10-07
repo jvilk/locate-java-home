@@ -1,5 +1,3 @@
-/// <reference path="../../typings/node/node.d.ts" />
-/// <reference path="../../typings/async/async.d.ts" />
 import async = require('async');
 import child_process = require('child_process');
 var spawn = child_process.spawn;
