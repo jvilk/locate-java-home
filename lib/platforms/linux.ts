@@ -41,7 +41,9 @@ export = function linuxFindJavaHome(cb: (homes: string[], executableExtension?: 
             var javaPath = stdout.toString();
             // Trace path.
             try {
-              javaPath = fs.readlinkSync(javaPath);
+              while (1) {
+                javaPath = fs.readlinkSync(javaPath);
+              }
             } catch (e) {
               // We reached the end of the link chain.
             }
