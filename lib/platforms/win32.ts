@@ -4,6 +4,10 @@ import async = require('async');
 import child_process = require('child_process');
 var spawn = child_process.spawn;
 
+interface IKeyInfo {
+  [valName: string]: string | IKeyInfo
+}
+
 /**
  * Find Java on Windows by checking registry keys.
  */
@@ -13,16 +17,25 @@ export = function windowsFindJavaHome(cb: (homes: string[], executableExtension?
   // - HKLM\Software\Wow6432Node\JavaSoft\Java Development Kit\1.[version] [32-bit JDK Arch, 64-bit OS arch]
 
   // TODO: Get a proper listing of all JDKs at these locations.
-  var keysToCheck: string[] = [].concat(['5','6','7','8','9'].map((ver) => [
-    `HKLM\\SOFTWARE\\JavaSoft\\Java Development Kit\\1.${ver}`,
-    `HKLM\\SOFTWARE\\Wow6432Node\\JavaSoft\\Java Development Kit\\1.${ver}`
-  ]));
+  var keysToCheck: string[] = [
+    `HKLM\\SOFTWARE\\JavaSoft\\Java Development Kit`,
+    `HKLM\\SOFTWARE\\JavaSoft\\Java Runtime Environment`,
+    `HKLM\\SOFTWARE\\Wow6432Node\\JavaSoft\\Java Development Kit`,
+    `HKLM\\SOFTWARE\\Wow6432Node\\JavaSoft\\Java Runtime Environment`
+  ];
 
   var discoveredJavaHomes: string[] = [];
   async.eachSeries(keysToCheck, (key: string, asyncCb: (err?: Error) => void) => {
-    getRegistryKey(key, (err: Error, values?: { [valName: string]: string }) => {
-      if (!err && values['JavaHome']) {
-        discoveredJavaHomes.push(values['JavaHome']);
+    getRegistryKey(key, (err: Error, values?: IKeyInfo) => {
+      if (!err) {
+        Object.keys(values).forEach((value) => {
+          if (typeof value === 'object') {
+            // subkey.
+            if ((<IKeyInfo> values[value])['JavaHome']) {
+              discoveredJavaHomes.push(<string> (<IKeyInfo> values[value])['JavaHome']);
+            }
+          }
+        });
       }
       asyncCb();
     });
@@ -37,7 +50,7 @@ export = function windowsFindJavaHome(cb: (homes: string[], executableExtension?
  * Inspired by node-winreg, but rewritten here due to a bug in that module.
  * https://github.com/fresc81/node-winreg
  */
-function getRegistryKey(key: string, cb: (err: Error, values?: {[valName: string]: string}) => void) {
+function getRegistryKey(key: string, cb: (err: Error, values?: IKeyInfo) => void) {
   var args = ['QUERY', key],
     proc = spawn('REG', args, {
       cwd: undefined,
@@ -58,7 +71,7 @@ function getRegistryKey(key: string, cb: (err: Error, values?: {[valName: string
       var lines = buffer.split('\n'),
         lineNumber = 0,
         items: string[] = [],
-        rv: { [valName: string]: string } = {};
+        rv: IKeyInfo = {};
 
       lines.forEach((line: string, idx: number) => {
         lines[idx] = line.trim();
@@ -70,16 +83,24 @@ function getRegistryKey(key: string, cb: (err: Error, values?: {[valName: string
         }
       });
 
-      items.forEach((item: string) => {
+      async.each(items, (item: string, asyncCb: (err?: Error) => void) => {
         var match = ITEM_PATTERN.exec(item);
         if (match) {
           // rv[valName] = value;
           // Second item is the type; we don't care about that.
           rv[match[1].trim()] = match[3];
+        } else if (item.slice(0, 4) === "HKEY") {
+          // It's a HKEY_[etc]\ path. Recursively expand!
+          getRegistryKey(item.trim(), (err, vals) => {
+            if (!err) {
+              rv[item.slice(item.lastIndexOf('\\') + 1)] = vals;
+            }
+            asyncCb(err);
+          });
         }
+      }, (err?: Error) => {
+        cb(err, rv);
       });
-
-      cb(null, rv);
     }
   });
 }
