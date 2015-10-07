@@ -1,0 +1,13 @@
+#!/usr/bin/env node
+var locate_java_home = require("../index.js");
+locate_java_home(function(err, javaHomes) {
+  if (err) {
+    console.log("Error finding JAVA_HOME:")
+    console.log(e);
+  } else {
+    console.log("JAVA_HOME directories Found: ");
+    javaHomes.forEach(function(javaHome) {
+      console.log(javaHome.version + " " + javaHome.path + (javaHome.isJDK ? " [JDK]" : ""));
+    });
+  }
+});

@@ -1,0 +1,32 @@
+{
+  "name": "locate-java-home",
+  "version": "0.1.0",
+  "description": "Locates JAVA_HOME on any platform, and can differentiate between different versions.",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jvilk/locate-java-home.git"
+  },
+  "scripts": {
+    "prepublish": "./node_modules/.bin/tsc ."
+  },
+  "bin": {
+    "locate-java-home": "./bin/locate-java-home"
+  },
+  "author": {
+    "email": "jvilk@cs.umass.edu",
+    "name": "John Vilk"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/jvilk/locate-java-home/issues"
+  },
+  "homepage": "https://github.com/jvilk/locate-java-home#readme",
+  "dependencies": {
+    "async": "^1.4.2",
+    "semver": "^5.0.3"
+  },
+  "devDependencies": {
+    "typescript": "^1.6.2"
+  }
+}

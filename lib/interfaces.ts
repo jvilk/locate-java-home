@@ -1,0 +1,36 @@
+export interface ILocateJavaHomeOptions {
+  // Semantic versioning string (e.g. ~1.6, >1.6....)
+  version?: string;
+  // Are you specifically looking for a JDK over a JRE?
+  mustBeJDK?: boolean;
+  // Are you specifically looking for a JRE over a JDK?
+  mustBeJRE?: boolean;
+  // Do you want locate-java-home to exit fatally if one of the found JAVA_HOME
+  // locations does not function appropriately? (Mainly useful for debugging.)
+  paranoid?: boolean;
+}
+
+/**
+ * Signature for a platform-specific function for finding JAVA_HOME locations.
+ * Invokes the callback with an array of JAVA_HOME locations (empty if none),
+ * and (optionally) the executable extension for the given platform, if any
+ * (e.g. .exe for Windows).
+ */
+export interface ILocateJavaHome {
+  (cb: (homes: string[], executableExtension?: string) => void): void;
+}
+
+/**
+ * Information about a particular JAVA_HOME location.
+ */
+export interface IJavaHomeInfo {
+  path: string;
+  version: string;
+  isJDK: boolean;
+  executables: {
+    java: string;
+    // Only defined for JDKs.
+    javac?: string;
+    javap?: string;
+  }
+}
