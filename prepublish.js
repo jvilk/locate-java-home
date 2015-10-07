@@ -13,7 +13,7 @@ function getNodeBinItem(name) {
 }
 
 var options = {
-  stdio: 'inherit', stderr: 'inherit'
+  stdio: 'inherit'
 }
 
 child_process.spawn(getNodeBinItem('tsd'), ["install"], options)
