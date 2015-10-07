@@ -89,11 +89,21 @@ Please file a bug at https://github.com/jvilk/locate-java-home and we can see wh
         }
       });
     }, (err?: Error) => {
+      var seenPaths: {[path: string]: boolean} = {};
       if (err) {
         cb(err);
       } else {
         cb(null, homeInfos
           .filter((homeInfo) => {
+            // Absolute pathify.
+            homeInfo.path = path.resolve(homeInfo.path);
+            // Filter redundant paths.
+            if (seenPaths[homeInfo.path]) {
+              return false;
+            } else {
+              seenPaths[homeInfo.path] = true;
+            }
+
             // JDK constraint
             return (!options.mustBeJDK || homeInfo.isJDK)
               // JRE constraint

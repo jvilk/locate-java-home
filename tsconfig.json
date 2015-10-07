@@ -3,7 +3,8 @@
         "module": "commonjs",
         "inlineSourceMap": true,
         "inlineSources": true,
-        "noImplicitAny": true
+        "noImplicitAny": true,
+        "declaration": true
     },
     "files": [
         "index.ts",
