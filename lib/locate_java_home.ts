@@ -66,7 +66,7 @@ function locateJavaHome(arg1: any, arg2?: (err: Error, found: string[]) => void)
 
   var locateJavaHome: interfaces.ILocateJavaHome;
   try {
-    locateJavaHome = require(`.${path.sep}platforms${path.sep}${process.platform}`);
+    locateJavaHome = require(`./platforms/${process.platform}`);
   } catch (e) {
     throw new Error(`Error: locate-java-home does not support the platform ${process.platform}.
 Please file a bug at https://github.com/jvilk/locate-java-home and we can see what we can do about that. :)`);
