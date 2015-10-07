@@ -16,11 +16,9 @@ export = function linuxFindJavaHome(cb: (homes: string[], executableExtension?: 
   exec('update-java-alternatives -l', (err: Error, stdout: Buffer, stderr: Buffer) => {
     // This returns error code 1 on success, for some reason.
     if (!err || (<any>err).code == 1) {
-      var alts = stdout.toString().split('\n');
+      var alts = stdout.toString().trim().split('\n');
       for (var i=0; i<alts.length; i++) {
-        if (alts[i].match(/1\.8/)) {
-          discoveredJavaHomes.push(alts[i].split(' ')[2]);
-        }
+        discoveredJavaHomes.push(alts[i].split(' ')[2]);
       }
     }
     // Option 2: Is JAVA_HOME defined?
