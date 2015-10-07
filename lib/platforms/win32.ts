@@ -98,6 +98,8 @@ function getRegistryKey(key: string, cb: (err: Error, values?: IKeyInfo) => void
             }
             asyncCb(err);
           });
+        } else {
+          asyncCb();
         }
       }, (err?: Error) => {
         cb(err, rv);
