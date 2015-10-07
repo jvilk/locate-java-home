@@ -29,7 +29,7 @@ export = function windowsFindJavaHome(cb: (homes: string[], executableExtension?
     getRegistryKey(key, (err: Error, values?: IKeyInfo) => {
       if (!err) {
         Object.keys(values).forEach((value) => {
-          if (typeof value === 'object') {
+          if (typeof values[value] === 'object') {
             // subkey.
             if ((<IKeyInfo> values[value])['JavaHome']) {
               discoveredJavaHomes.push(<string> (<IKeyInfo> values[value])['JavaHome']);

@@ -166,7 +166,7 @@ function getBinaryPath(home: string, name: string, executableExtension?: string)
  * Given a path to the java executable, get the version of JAVA_HOME.
  */
 function getJavaVersionAndDataModel(javaPath: string, cb: (err: Error, version?: string, is64Bit?: boolean) => void) {
-  exec(`${javaPath} -version`, function (err: Error, stdout: Buffer, stderr: Buffer) {
+  exec(`"${javaPath}" -version`, function (err: Error, stdout: Buffer, stderr: Buffer) {
     if (err) {
       return cb(err);
     }

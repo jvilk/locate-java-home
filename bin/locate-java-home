@@ -3,7 +3,7 @@ var locate_java_home = require("../index.js");
 locate_java_home(function(err, javaHomes) {
   if (err) {
     console.log("Error finding JAVA_HOME:")
-    console.log(e);
+    console.log(err);
   } else {
     console.log("JAVA_HOME directories Found: ");
     javaHomes.forEach(function(javaHome) {
