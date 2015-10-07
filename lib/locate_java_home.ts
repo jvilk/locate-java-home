@@ -110,7 +110,7 @@ Please file a bug at https://github.com/jvilk/locate-java-home and we can see wh
               && (!options.mustBeJRE || !homeInfo.isJDK)
               // version constraint
               && semver.satisfies(homeInfo.version, options.version);
-          })
+          }).sort((a, b) => a.path.localeCompare(b.path))
         );
       }
     });
