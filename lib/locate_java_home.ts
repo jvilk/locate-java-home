@@ -15,7 +15,8 @@ var defaultOptions: ILocateJavaHomeOptions = {
   version: "*",
   mustBeJDK: false,
   mustBeJRE: false,
-  paranoid: false
+  paranoid: false,
+  mustBe64Bit: false
 };
 
 /**
@@ -38,6 +39,7 @@ function fillInDefaults(opts: ILocateJavaHomeOptions): ILocateJavaHomeOptions {
     version: getProp('version'),
     mustBeJDK: getProp('mustBeJDK'),
     mustBeJRE: getProp('mustBeJRE'),
+    mustBe64Bit: getProp('mustBe64Bit'),
     paranoid: getProp('paranoid')
   };
 }
@@ -108,6 +110,8 @@ Please file a bug at https://github.com/jvilk/locate-java-home and we can see wh
             return (!options.mustBeJDK || homeInfo.isJDK)
               // JRE constraint
               && (!options.mustBeJRE || !homeInfo.isJDK)
+              // 64-bit constraint
+              && (!options.mustBe64Bit || homeInfo.is64Bit)
               // version constraint
               && semver.satisfies(homeInfo.version, options.version);
           }).sort((a, b) => a.path.localeCompare(b.path))
@@ -124,7 +128,7 @@ function getJavaHomeInfo(home: string, executableExtension: string, cb: (err: Er
   var javaPath = getBinaryPath(home, 'java', executableExtension),
     javacPath = getBinaryPath(home, 'javac', executableExtension),
     info: IJavaHomeInfo;
-  getJavaVersion(javaPath, (err: Error, version?: string) => {
+  getJavaVersionAndDataModel(javaPath, (err: Error, version?: string, is64Bit?: boolean) => {
     if (err) {
       cb(err);
     } else {
@@ -132,6 +136,7 @@ function getJavaHomeInfo(home: string, executableExtension: string, cb: (err: Er
         path: home,
         version: version,
         isJDK: javacPath !== null,
+        is64Bit: is64Bit,
         executables: {
           java: javaPath
         }
@@ -160,13 +165,14 @@ function getBinaryPath(home: string, name: string, executableExtension?: string)
 /**
  * Given a path to the java executable, get the version of JAVA_HOME.
  */
-function getJavaVersion(javaPath: string, cb: (err: Error, version?: string) => void) {
+function getJavaVersionAndDataModel(javaPath: string, cb: (err: Error, version?: string, is64Bit?: boolean) => void) {
   exec(`${javaPath} -version`, function (err: Error, stdout: Buffer, stderr: Buffer) {
     if (err) {
       return cb(err);
     }
     // TODO: Make this more robust to errors.
-    return cb(err, /(\d+\.\d+\.\d+)/.exec(stderr.toString())[1]);
+    var output = stderr.toString();
+    return cb(err, /(\d+\.\d+\.\d+)/.exec(output)[1], output.toLowerCase().indexOf("64-bit") !== -1);
   });
 }
 

@@ -5,6 +5,8 @@ export interface ILocateJavaHomeOptions {
   mustBeJDK?: boolean;
   // Are you specifically looking for a JRE over a JDK?
   mustBeJRE?: boolean;
+  // Are you looking for a 64-bit JAVA_HOME?
+  mustBe64Bit?: boolean;
   // Do you want locate-java-home to exit fatally if one of the found JAVA_HOME
   // locations does not function appropriately? (Mainly useful for debugging.)
   paranoid?: boolean;
@@ -27,6 +29,7 @@ export interface IJavaHomeInfo {
   path: string;
   version: string;
   isJDK: boolean;
+  is64Bit: boolean;
   executables: {
     java: string;
     // Only defined for JDKs.

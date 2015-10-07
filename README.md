@@ -61,6 +61,8 @@ LocateJavaHome(function(error, javaHomes) {});
   version: string;
   // True if this JAVA_HOME is a JDK, false if it is a JRE.
   isJDK: boolean;
+  // Is this version of Java 64-bit?
+  is64Bit: boolean;
   // Paths to various executables.
   executables: {
     java: string;
@@ -83,6 +85,8 @@ LocateJavaHome(function(error, javaHomes) {});
   mustBeJDK: boolean;
   // Are you specifically looking for a JRE over a JDK?
   mustBeJRE: boolean;
+  // Are you specifically looking for a 64-bit JAVA_HOME?
+  mustBe64Bit: boolean;
   // Do you want locate-java-home to exit fatally if one of the found JAVA_HOME
   // locations does not function appropriately? (Mainly useful for debugging.)
   paranoid: boolean;

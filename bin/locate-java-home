@@ -7,7 +7,7 @@ locate_java_home(function(err, javaHomes) {
   } else {
     console.log("JAVA_HOME directories Found: ");
     javaHomes.forEach(function(javaHome) {
-      console.log(javaHome.version + " " + javaHome.path + (javaHome.isJDK ? " [JDK]" : ""));
+      console.log(javaHome.version + " " + javaHome.path + (javaHome.is64Bit ? " [64-bit]" : " [32-bit]") + (javaHome.isJDK ? " [JDK]" : ""));
     });
   }
 });
