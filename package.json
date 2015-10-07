@@ -8,7 +8,7 @@
     "url": "git+https://github.com/jvilk/locate-java-home.git"
   },
   "scripts": {
-    "prepublish": "./node_modules/.bin/tsc ."
+    "prepublish": "./node_modules/.bin/tsc"
   },
   "bin": {
     "locate-java-home": "./bin/locate-java-home"
