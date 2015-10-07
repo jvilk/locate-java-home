@@ -1,4 +1,4 @@
-# locate-java-home v0.1.1
+# locate-java-home v0.1.2
 > Locates `JAVA_HOME` on any platform, and can differentiate between different versions.
 
 ## Usage
