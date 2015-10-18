@@ -46,11 +46,11 @@ function fillInDefaults(opts: ILocateJavaHomeOptions): ILocateJavaHomeOptions {
  *
  * Calls the callback with a matching JAVA_HOME.
  */
-function locateJavaHome(cb: (err: Error, found: string[]) => void): void;
-function locateJavaHome(options: ILocateJavaHomeOptions, cb: (err: Error, found: string[]) => void): void;
-function locateJavaHome(arg1: any, arg2?: (err: Error, found: string[]) => void): void {
+function locateJavaHome(cb: (err: Error, found?: IJavaHomeInfo[]) => void): void;
+function locateJavaHome(options: ILocateJavaHomeOptions, cb: (err: Error, found?: IJavaHomeInfo[]) => void): void;
+function locateJavaHome(arg1: any, arg2?: (err: Error, found?: IJavaHomeInfo[]) => void): void {
   var options: ILocateJavaHomeOptions = defaultOptions,
-    cb = arg1;
+    cb: (err: Error, found?: IJavaHomeInfo[]) => void = arg1;
   if (arg2) {
     cb = arg2;
     options = fillInDefaults(arg1);
