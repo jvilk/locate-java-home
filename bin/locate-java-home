@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-var locate_java_home = require("../index.js");
+var locate_java_home = require("../js/index.js");
 locate_java_home(function(err, javaHomes) {
   if (err) {
     console.log("Error finding JAVA_HOME:")
