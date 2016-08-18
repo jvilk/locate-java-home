@@ -1,6 +1,6 @@
 {
   "name": "locate-java-home",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "Locates JAVA_HOME on any platform, and can differentiate between different versions.",
   "main": "js/index.js",
   "typings": "js/index",

@@ -169,7 +169,12 @@ function getJavaVersionAndDataModel(javaPath: string, cb: (err: Error, version?:
     }
     // TODO: Make this more robust to errors.
     var output = stderr.toString();
-    return cb(err, /(\d+\.\d+\.\d+)/.exec(output)[1], output.toLowerCase().indexOf("64-bit") !== -1);
+    var versionData = /(\d+\.\d+\.\d+)/.exec(output);
+    var version = "0.0.0";
+    if (versionData !== null) {
+      version = versionData[1];
+    }
+    return cb(err, version, output.toLowerCase().indexOf("64-bit") !== -1);
   });
 }
 
