@@ -39,7 +39,12 @@ export = function linuxFindJavaHome(cb: (homes: string[], executableExtension?: 
             // Trace path.
             try {
               while (1) {
-                javaPath = fs.readlinkSync(javaPath);
+                var newJavaPath = fs.readlinkSync(javaPath);
+                if (path.isAbsolute(newJavaPath)) {
+                  javaPath = newJavaPath;
+                } else {
+                  javaPath = path.resolve(path.dirname(javaPath), newJavaPath);
+                }
               }
             } catch (e) {
               // We reached the end of the link chain.
