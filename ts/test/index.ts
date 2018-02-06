@@ -32,7 +32,6 @@ describe('API Tests', function() {
       LocateJavaHome({ mustBeJDK: true }, (err, found?: Array<IJavaHomeInfo>) => {
         assertEqual(!err, true, `An error occurred while finding JAVA_HOME: ${err}`);
         assertEqual(found!.length > 0, true, `No JAVA_HOME found`);
-        javaHomes = found!;
         resolve();
       });
     });
