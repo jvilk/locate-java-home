@@ -80,8 +80,6 @@ describe(`CLI Tests`, () => {
     const output = spawnSync('node', [LJH_BIN]);
     const lines = output.stdout.toString().trim().split("\n");
     assertEqual(lines.length, javaHomes.length + 1, `Should print all found JAVA_HOMES`);
-    const firstJavaHome = javaHomes[0];
-    const firstJavaHomeLines = lines.filter((l) => l.indexOf(firstJavaHome.path) !== -1);
-    assertEqual(firstJavaHomeLines.length, 1, `There should be one line of output for each JAVA_HOME found.`);
+    assertEqual(lines.length, new Set(lines).size, `There should be one line of output for each JAVA_HOME found.`);
   });
 });
