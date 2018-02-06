@@ -27,6 +27,16 @@ describe('API Tests', function() {
       });
     });
   });
+  it('Finds JDK', async () => {
+    return new Promise<void>((resolve, reject) => {
+      LocateJavaHome({ mustBeJDK: true }, (err, found?: Array<IJavaHomeInfo>) => {
+        assertEqual(!err, true, `An error occurred while finding JAVA_HOME: ${err}`);
+        assertEqual(found!.length > 0, true, `No JAVA_HOME found`);
+        javaHomes = found!;
+        resolve();
+      });
+    });
+  });
   it('Found Java installations match data reported by LocateJavaHome', () => {
     for (const javaHome of javaHomes) {
       const java = javaHome.executables.java;
