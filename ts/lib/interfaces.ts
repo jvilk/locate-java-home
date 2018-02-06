@@ -28,6 +28,7 @@ export interface ILocateJavaHome {
 export interface IJavaHomeInfo {
   path: string;
   version: string;
+  security: number;
   isJDK: boolean;
   is64Bit: boolean;
   executables: {

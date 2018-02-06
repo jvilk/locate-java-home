@@ -1,4 +1,4 @@
-# locate-java-home v1.0.1
+# locate-java-home v1.1.0
 > Locates `JAVA_HOME` on any platform, and can differentiate between different versions.
 
 [![Build Status](https://travis-ci.org/jvilk/locate-java-home.svg?branch=master)](https://travis-ci.org/jvilk/locate-java-home)
@@ -62,6 +62,12 @@ LocateJavaHome(function(error, javaHomes) {});
   path: string;
   // Version of Java in the JAVA_HOME.
   version: string;
+  // Security number of this version of Java.
+  // Typically, you want a version with the largest security number.
+  // Note: For Java 9 and later, this will always be '0' as this is now
+  // encoded into the version number. See http://openjdk.java.net/jeps/223
+  // and https://blogs.oracle.com/java-platform-group/a-new-jdk-9-version-string-scheme
+  security: number;
   // True if this JAVA_HOME is a JDK, false if it is a JRE.
   isJDK: boolean;
   // Is this version of Java 64-bit?

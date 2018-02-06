@@ -107,13 +107,14 @@ function getJavaHomeInfo(home: string, executableExtension: string | undefined, 
   if (!javaPath) {
     return cb(new Error(`Unable to locate 'java' executable in path ${home}`));
   }
-  getJavaVersionAndDataModel(javaPath, (err: Error | null, version?: string, is64Bit?: boolean) => {
+  getJavaVersionAndDataModel(javaPath, (err: Error | null, version?: string, security?: number, is64Bit?: boolean) => {
     if (err) {
       cb(err);
     } else {
       let info: IJavaHomeInfo = {
         path: home,
         version: version!,
+        security: security!,
         isJDK: javacPath !== null,
         is64Bit: is64Bit!,
         executables: {
@@ -144,19 +145,24 @@ function getBinaryPath(home: string, name: string, executableExtension?: string)
 /**
  * Given a path to the java executable, get the version of JAVA_HOME.
  */
-function getJavaVersionAndDataModel(javaPath: string, cb: (err: Error | null, version?: string, is64Bit?: boolean) => void) {
+function getJavaVersionAndDataModel(javaPath: string, cb: (err: Error | null, version?: string, security?: number, is64Bit?: boolean) => void) {
   exec(`"${javaPath}" -version`, function (err: Error | null, stdout: string | Buffer, stderr: string | Buffer) {
     if (err) {
       return cb(err);
     }
     // TODO: Make this more robust to errors.
     const output = stderr.toString();
-    const versionData = /(\d+\.\d+\.\d+)/.exec(output);
+    const versionData = /(\d+\.\d+\.\d+)(_(\d+))?/.exec(output);
     let version = "0.0.0";
+    let security = 0;
     if (versionData !== null) {
       version = versionData[1];
+      security = parseInt(versionData[3], 10);
+      if (isNaN(security)) {
+        security = 0;
+      }
     }
-    return cb(err, version, output.toLowerCase().indexOf("64-bit") !== -1);
+    return cb(err, version, security, output.toLowerCase().indexOf("64-bit") !== -1);
   });
 }
 

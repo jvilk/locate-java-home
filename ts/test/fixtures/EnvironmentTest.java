@@ -6,13 +6,15 @@ class EnvironmentTest {
   public static void main(String[] args) {
     // Escape backslashes in path (Windows).
     String path = System.getProperty("java.home").replace("\\", "\\\\");
-    String version = System.getProperty("java.version");
-    int index = version.indexOf('_');
+    String versionFull = System.getProperty("java.version");
+    int index = versionFull.indexOf('_');
+    String version = versionFull;
+    String security = "0";
     if (index != -1) {
-      version = version.substring(0, index);
+      version = versionFull.substring(0, index);
+      security = versionFull.substring(index + 1);
     }
-
     boolean is64Bit = System.getProperty("sun.arch.data.model").equals("64");
-    System.out.println("{\"path\": \"" + path + "\", \"version\": \"" + version + "\", \"is64Bit\": " + is64Bit + " }");
+    System.out.println("{\"path\": \"" + path + "\", \"version\": \"" + version + "\", \"is64Bit\": " + is64Bit + ", \"security\": " + security + " }");
   }
 }

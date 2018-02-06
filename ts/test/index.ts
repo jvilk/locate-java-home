@@ -8,6 +8,7 @@ import {spawnSync} from 'child_process';
 interface EnvironmentTestOutput {
   path: string;
   version: string;
+  security: number;
   is64Bit: boolean;
 }
 
@@ -40,6 +41,7 @@ describe('API Tests', function() {
       } else {
         assertEqual(realpathSync(javaHome.path), realpathSync(envData.path));
       }
+      assertEqual(javaHome.security, envData.security);
       assertEqual(javaHome.is64Bit, envData.is64Bit);
       assertEqual(javaHome.version, envData.version);
     }
