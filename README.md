@@ -1,4 +1,4 @@
-# locate-java-home v0.1.5
+# locate-java-home v1.0.0
 > Locates `JAVA_HOME` on any platform, and can differentiate between different versions.
 
 ## Usage
@@ -6,7 +6,7 @@
     npm install locate-java-home
 
 ```js
-var LocateJavaHome = require('locate-java-home');
+import LocateJavaHome from 'locate-java-home'; // or var ImportJavaHome = require('locate-java-home').default;
 LocateJavaHome(function(error, javaHomes) {
    javaHomes.forEach(function(homeInfo) {
       console.log("Found Java " + homeInfo.version + " at " + homeInfo.path);

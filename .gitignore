@@ -2,4 +2,4 @@
 js
 *.d.ts
 node_modules
-typings
+.vscode

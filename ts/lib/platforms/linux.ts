@@ -1,7 +1,6 @@
-import child_process = require('child_process');
-import fs = require('fs');
-import path = require('path');
-var exec = child_process.exec;
+import {exec} from 'child_process';
+import {resolve as resolvePath, dirname} from 'path';
+import {readlinkSync} from 'fs';
 
 /**
  * Find Java in Linux using three methods:
@@ -9,48 +8,45 @@ var exec = child_process.exec;
  * - the JAVA_HOME environment variable
  * - Java on the PATH.
  */
-export = function linuxFindJavaHome(cb: (homes: string[], executableExtension?: string) => void): void {
-  var discoveredJavaHomes: string[] = [];
+export default function linuxFindJavaHome(cb: (homes: string[], executableExtension?: string) => void): void {
+  const discoveredJavaHomes: string[] = [];
   // Option 1: Try the 'update-java-alternatives' tool
-  exec('update-java-alternatives -l', (err: Error, stdout: Buffer, stderr: Buffer) => {
+  exec('update-java-alternatives -l', (err: Error | null, stdout: Buffer | string, stderr: Buffer | string) => {
     // This returns error code 1 on success, for some reason.
     if (!err || (<any>err).code == 1) {
-      var alts = stdout.toString().trim().split('\n');
-      for (var i=0; i<alts.length; i++) {
-        discoveredJavaHomes.push(alts[i].split(' ')[2]);
+      const alts = stdout.toString().trim().split('\n');
+      for (const alt of alts) {
+        // "java-1.7.0-openjdk-amd64 1071 /usr/lib/jvm/java-1.7.0-openjdk-amd64"
+        discoveredJavaHomes.push(alt.split(' ')[2]);
       }
     }
     // Option 2: Is JAVA_HOME defined?
     // (NOTE: locate_java_home will prune redundancies.)
     if (process.env.JAVA_HOME) {
-      discoveredJavaHomes.push(process.env.JAVA_HOME);
+      discoveredJavaHomes.push(process.env.JAVA_HOME!);
     }
 
     // Option 3: Can we invoke 'java' directly?
-    exec(`java -version`, function(err: Error, stdout: Buffer, stderr: Buffer) {
+    exec(`java -version`, function(err: Error | null, stdout: Buffer | string, stderr: Buffer | string) {
       if (err) {
         // Nope. Return what we have.
         cb(discoveredJavaHomes);
       } else {
         // Find JAVA_HOME for Java.
-        exec(`which java`, function(err: Error, stdout: Buffer, stderr: Buffer) {
+        exec(`which java`, function(err: Error | null, stdout: Buffer | string, stderr: Buffer | string) {
           if (!err) {
-            var javaPath = stdout.toString().trim();
-            // Trace path.
+            let javaPath = stdout.toString().trim();
+            // Trace path through symlinks
             try {
               while (1) {
-                var newJavaPath = fs.readlinkSync(javaPath);
-                if (path.isAbsolute(newJavaPath)) {
-                  javaPath = newJavaPath;
-                } else {
-                  javaPath = path.resolve(path.dirname(javaPath), newJavaPath);
-                }
+                // Some symlinks are relative. .resolve is a NOP for absolute paths.
+                javaPath = resolvePath(dirname(javaPath), readlinkSync(javaPath));
               }
             } catch (e) {
               // We reached the end of the link chain.
             }
             // JAVA_HOME/bin/java => JAVA_HOME
-            discoveredJavaHomes.push(path.resolve(javaPath, "..", ".."));
+            discoveredJavaHomes.push(resolvePath(javaPath, "..", ".."));
           }
           cb(discoveredJavaHomes);
         });

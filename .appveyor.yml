@@ -1,0 +1,11 @@
+# We're not a C# project.
+build: off
+cache:
+  - node_modules
+  - '%APPDATA%\npm-cache'
+install:
+  - ps: Install-Product node 8
+  - node --version
+  - npm install
+test_script:
+  - npm test

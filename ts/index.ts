@@ -1,2 +1,2 @@
-import locate_java_home = require('./lib/locate_java_home');
-export = locate_java_home;
+import LocateJavaHome from './lib/locate_java_home';
+export default LocateJavaHome;

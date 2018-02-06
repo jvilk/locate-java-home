@@ -1,0 +1,25 @@
+sudo: false
+matrix:
+  include:
+    - os: osx
+      osx_image: xcode7.3
+      language: generic
+    - dist: trusty
+      language: node_js
+      node_js: 8
+cache:
+  directories:
+    - $HOME/.npm
+install:
+  # Workaround for node_js not working properly in Travis OSX.
+  - |
+    if [[ $TRAVIS_OS_NAME == "osx" ]]
+    then
+        nvm install 8
+        nvm use 8
+    fi
+  - echo $JAVA_HOME
+  - which java
+  - npm install
+script:
+  - npm test

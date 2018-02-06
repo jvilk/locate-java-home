@@ -1,11 +1,11 @@
 #!/usr/bin/env node
-var locate_java_home = require("../js/index.js");
+const locate_java_home = require("../js/es5/index.js").default;
 locate_java_home(function(err, javaHomes) {
   if (err) {
     console.log("Error finding JAVA_HOME:")
     console.log(err);
   } else {
-    console.log("JAVA_HOME directories Found: ");
+    console.log("JAVA_HOME directories found: ");
     javaHomes.forEach(function(javaHome) {
       console.log(javaHome.version + " " + javaHome.path + (javaHome.is64Bit ? " [64-bit]" : " [32-bit]") + (javaHome.isJDK ? " [JDK]" : ""));
     });

@@ -1,15 +1,13 @@
 {
     "compilerOptions": {
-        "module": "commonjs",
+        "module": "es6",
         "target": "es6",
         "inlineSourceMap": true,
         "inlineSources": true,
         "noImplicitAny": true,
         "strict": true,
-        "noUnusedLocals": true,
-        "noImplicitThis": true,
         "declaration": true,
-        "outDir": "js/es5"
+        "outDir": "js/es6"
     },
     "include": [
         "ts/**/*.ts"

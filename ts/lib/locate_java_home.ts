@@ -1,14 +1,12 @@
-import path = require('path');
-import fs = require('fs');
-import child_process = require('child_process');
-import semver = require('semver');
-import async = require('async');
-import interfaces = require('./interfaces');
-import ILocateJavaHomeOptions = interfaces.ILocateJavaHomeOptions;
-import IJavaHomeInfo = interfaces.IJavaHomeInfo;
-var exec = child_process.exec;
+import {existsSync} from 'fs';
+import {resolve as resolvePath} from 'path';
+import {exec} from 'child_process';
+import {satisfies as semverSatisfies} from 'semver';
+import {each as asyncEach} from 'async';
+import {ILocateJavaHomeOptions, IJavaHomeInfo, ILocateJavaHome} from './interfaces';
+import Platform from './platform';
 
-var defaultOptions: ILocateJavaHomeOptions = {
+const defaultOptions = {
   version: "*",
   mustBeJDK: false,
   mustBeJRE: false,
@@ -16,29 +14,17 @@ var defaultOptions: ILocateJavaHomeOptions = {
   mustBe64Bit: false
 };
 
+type StandardizedOptions = ILocateJavaHomeOptions & typeof defaultOptions;
+
 /**
  * Return an ILocateJavaHomeOptions object with defaults filled in.
  */
-function fillInDefaults(opts: ILocateJavaHomeOptions): ILocateJavaHomeOptions {
-  function getProp(prop: string) {
-    if (opts.hasOwnProperty(prop)) {
-      return (<any> opts)[prop];
-    }
-    return (<any> defaultOptions)[prop];
-  }
-
+function fillInDefaults(opts: ILocateJavaHomeOptions): StandardizedOptions {
   // semver standardization
   if (opts.version === 'any') {
     opts.version = "*";
   }
-
-  return {
-    version: getProp('version'),
-    mustBeJDK: getProp('mustBeJDK'),
-    mustBeJRE: getProp('mustBeJRE'),
-    mustBe64Bit: getProp('mustBe64Bit'),
-    paranoid: getProp('paranoid')
-  };
+  return Object.assign({}, defaultOptions, opts);
 }
 
 /**
@@ -46,11 +32,11 @@ function fillInDefaults(opts: ILocateJavaHomeOptions): ILocateJavaHomeOptions {
  *
  * Calls the callback with a matching JAVA_HOME.
  */
-function locateJavaHome(cb: (err: Error, found?: IJavaHomeInfo[]) => void): void;
-function locateJavaHome(options: ILocateJavaHomeOptions, cb: (err: Error, found?: IJavaHomeInfo[]) => void): void;
-function locateJavaHome(arg1: any, arg2?: (err: Error, found?: IJavaHomeInfo[]) => void): void {
-  var options: ILocateJavaHomeOptions = defaultOptions,
-    cb: (err: Error, found?: IJavaHomeInfo[]) => void = arg1;
+function locateJavaHome(cb: (err: Error | null, found?: IJavaHomeInfo[]) => void): void;
+function locateJavaHome(options: ILocateJavaHomeOptions, cb: (err: Error | null, found?: IJavaHomeInfo[]) => void): void;
+function locateJavaHome(arg1: any, arg2?: (err: Error | null, found?: IJavaHomeInfo[]) => void): void {
+  let options: StandardizedOptions = defaultOptions;
+  let cb: (err: Error | null, found?: IJavaHomeInfo[]) => void = arg1;
   if (arg2) {
     cb = arg2;
     options = fillInDefaults(arg1);
@@ -61,23 +47,17 @@ function locateJavaHome(arg1: any, arg2?: (err: Error, found?: IJavaHomeInfo[]) 
     return cb(new Error(`Unsatisfiable options: A JAVA_HOME cannot be both a JDK and not a JDK.`), []);
   }
 
-  var locateJavaHome: interfaces.ILocateJavaHome;
-  try {
-    locateJavaHome = require(`./platforms/${process.platform}`);
-  } catch (e) {
-    throw new Error(`Error: locate-java-home does not support the platform ${process.platform}.
-Please file a bug at https://github.com/jvilk/locate-java-home and we can see what we can do about that. :)`);
-  }
+  let locateJavaHome: ILocateJavaHome = Platform(process.platform);
 
   locateJavaHome((homes: string[], executableExtension?: string) => {
-    var homeInfos: IJavaHomeInfo[] = [];
+    const homeInfos: IJavaHomeInfo[] = [];
     // NOTE: We don't use async.map here because we want to be error tolerant
     // in case some of the JAVA_HOME locations are erroneous.
-    async.each(homes, (home: string, asyncCb: (err?: Error) => void) => {
-      getJavaHomeInfo(home, executableExtension, (err: Error, homeInfo?: IJavaHomeInfo) => {
+    asyncEach(homes, (home: string, asyncCb: (err?: Error) => void) => {
+      getJavaHomeInfo(home, executableExtension, (err: Error | null, homeInfo?: IJavaHomeInfo) => {
         if (!err) {
           // Push the info and continue iteration.
-          homeInfos.push(homeInfo);
+          homeInfos.push(homeInfo!);
           asyncCb();
         } else if (options.paranoid) {
           // Report the error, halting iteration.
@@ -95,7 +75,7 @@ Please file a bug at https://github.com/jvilk/locate-java-home and we can see wh
         cb(null, homeInfos
           .filter((homeInfo) => {
             // Absolute pathify.
-            homeInfo.path = path.resolve(homeInfo.path);
+            homeInfo.path = resolvePath(homeInfo.path);
             // Filter redundant paths.
             if (seenPaths[homeInfo.path]) {
               return false;
@@ -110,7 +90,7 @@ Please file a bug at https://github.com/jvilk/locate-java-home and we can see wh
               // 64-bit constraint
               && (!options.mustBe64Bit || homeInfo.is64Bit)
               // version constraint
-              && semver.satisfies(homeInfo.version, options.version);
+              && semverSatisfies(homeInfo.version, options.version);
           }).sort((a, b) => a.path.localeCompare(b.path))
         );
       }
@@ -121,27 +101,29 @@ Please file a bug at https://github.com/jvilk/locate-java-home and we can see wh
 /**
  * Get the IJavaHomeInfo object for the given path.
  */
-function getJavaHomeInfo(home: string, executableExtension: string, cb: (err: Error, info?: interfaces.IJavaHomeInfo) => void): void {
-  var javaPath = getBinaryPath(home, 'java', executableExtension),
-    javacPath = getBinaryPath(home, 'javac', executableExtension),
-    info: IJavaHomeInfo;
-  getJavaVersionAndDataModel(javaPath, (err: Error, version?: string, is64Bit?: boolean) => {
+function getJavaHomeInfo(home: string, executableExtension: string | undefined, cb: (err: Error | null, info?: IJavaHomeInfo) => void): void {
+  const javaPath = getBinaryPath(home, 'java', executableExtension);
+  const javacPath = getBinaryPath(home, 'javac', executableExtension);
+  if (!javaPath) {
+    return cb(new Error(`Unable to locate 'java' executable in path ${home}`));
+  }
+  getJavaVersionAndDataModel(javaPath, (err: Error | null, version?: string, is64Bit?: boolean) => {
     if (err) {
       cb(err);
     } else {
-      info = {
+      let info: IJavaHomeInfo = {
         path: home,
-        version: version,
+        version: version!,
         isJDK: javacPath !== null,
-        is64Bit: is64Bit,
+        is64Bit: is64Bit!,
         executables: {
           java: javaPath
         }
       };
 
-      if (info.isJDK) {
+      if (javacPath) {
         info.executables.javac = javacPath;
-        info.executables.javap = getBinaryPath(home, 'javap', executableExtension);
+        info.executables.javap = getBinaryPath(home, 'javap', executableExtension)!;
       }
       cb(null, info);
     }
@@ -151,9 +133,9 @@ function getJavaHomeInfo(home: string, executableExtension: string, cb: (err: Er
 /**
  * Get the path to a binary in JAVA_HOME. Returns NULL if it does not exist.
  */
-function getBinaryPath(home: string, name: string, executableExtension?: string): string {
-  var binPath = path.resolve(home, 'bin', `${name}${executableExtension ? `.${executableExtension}` : ''}`);
-  if (fs.existsSync(binPath)) {
+function getBinaryPath(home: string, name: string, executableExtension?: string): string | null {
+  const binPath = resolvePath(home, 'bin', `${name}${executableExtension ? `.${executableExtension}` : ''}`);
+  if (existsSync(binPath)) {
     return binPath;
   }
   return null;
@@ -162,15 +144,15 @@ function getBinaryPath(home: string, name: string, executableExtension?: string)
 /**
  * Given a path to the java executable, get the version of JAVA_HOME.
  */
-function getJavaVersionAndDataModel(javaPath: string, cb: (err: Error, version?: string, is64Bit?: boolean) => void) {
-  exec(`"${javaPath}" -version`, function (err: Error, stdout: Buffer, stderr: Buffer) {
+function getJavaVersionAndDataModel(javaPath: string, cb: (err: Error | null, version?: string, is64Bit?: boolean) => void) {
+  exec(`"${javaPath}" -version`, function (err: Error | null, stdout: string | Buffer, stderr: string | Buffer) {
     if (err) {
       return cb(err);
     }
     // TODO: Make this more robust to errors.
-    var output = stderr.toString();
-    var versionData = /(\d+\.\d+\.\d+)/.exec(output);
-    var version = "0.0.0";
+    const output = stderr.toString();
+    const versionData = /(\d+\.\d+\.\d+)/.exec(output);
+    let version = "0.0.0";
     if (versionData !== null) {
       version = versionData[1];
     }
@@ -178,4 +160,4 @@ function getJavaVersionAndDataModel(javaPath: string, cb: (err: Error, version?:
   });
 }
 
-export = locateJavaHome;
+export default locateJavaHome;

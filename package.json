@@ -1,15 +1,17 @@
 {
   "name": "locate-java-home",
-  "version": "0.1.7",
+  "version": "1.0.0",
   "description": "Locates JAVA_HOME on any platform, and can differentiate between different versions.",
-  "main": "js/index.js",
-  "typings": "js/index",
+  "main": "js/es5/index.js",
+  "module": "js/es6/index.js",
+  "typings": "js/es5/index",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/jvilk/locate-java-home.git"
   },
   "scripts": {
-    "prepublish": "node prepublish.js"
+    "prepare": "tsc && tsc -p tsconfig.es6.json && javac -source 1.6 -target 1.6 ts/test/fixtures/EnvironmentTest.java",
+    "test": "mocha js/es5/test --timeout 30000"
   },
   "bin": {
     "locate-java-home": "./bin/locate-java-home"
@@ -24,11 +26,15 @@
   },
   "homepage": "https://github.com/jvilk/locate-java-home#readme",
   "dependencies": {
-    "async": "^1.4.2",
-    "semver": "^5.0.3"
+    "@types/async": "^2.0.47",
+    "@types/mocha": "^2.2.45",
+    "@types/node": "^9.4.0",
+    "@types/semver": "^5.5.0",
+    "async": "^2.6.0",
+    "mocha": "^3.5.3",
+    "semver": "^5.5.0"
   },
   "devDependencies": {
-    "tsd": "^0.6.5",
-    "typescript": "^1.6.2"
+    "typescript": "^2.4.1"
   }
 }
