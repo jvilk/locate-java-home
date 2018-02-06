@@ -26,31 +26,40 @@ export default function linuxFindJavaHome(cb: (homes: string[], executableExtens
       discoveredJavaHomes.push(process.env.JAVA_HOME!);
     }
 
-    // Option 3: Can we invoke 'java' directly?
-    exec(`java -version`, function(err: Error | null, stdout: Buffer | string, stderr: Buffer | string) {
-      if (err) {
-        // Nope. Return what we have.
-        cb(discoveredJavaHomes);
-      } else {
-        // Find JAVA_HOME for Java.
-        exec(`which java`, function(err: Error | null, stdout: Buffer | string, stderr: Buffer | string) {
-          if (!err) {
-            let javaPath = stdout.toString().trim();
-            // Trace path through symlinks
-            try {
-              while (1) {
-                // Some symlinks are relative. .resolve is a NOP for absolute paths.
-                javaPath = resolvePath(dirname(javaPath), readlinkSync(javaPath));
-              }
-            } catch (e) {
-              // We reached the end of the link chain.
-            }
-            // JAVA_HOME/bin/java => JAVA_HOME
-            discoveredJavaHomes.push(resolvePath(javaPath, "..", ".."));
-          }
+    // Option 3: Can we invoke binary directly?
+    function findByBinary(binaryName: string, newCb: () => any) {
+      exec(`${binaryName} -version`, function (err: Error | null, stdout: Buffer | string, stderr: Buffer | string) {
+        if (err) {
+          // Nope. Return what we have.
           cb(discoveredJavaHomes);
-        });
-      }
+        } else {
+          // Find JAVA_HOME for Java.
+          exec(`which ${binaryName}`, function (err: Error | null, stdout: Buffer | string, stderr: Buffer | string) {
+            if (!err) {
+              let javaPath = stdout.toString().trim();
+              // Trace path through symlinks
+              try {
+                while (1) {
+                  // Some symlinks are relative. .resolve is a NOP for absolute paths.
+                  javaPath = resolvePath(dirname(javaPath), readlinkSync(javaPath));
+                }
+              } catch (e) {
+                // We reached the end of the link chain.
+              }
+              // JAVA_HOME/bin/java => JAVA_HOME
+              discoveredJavaHomes.push(resolvePath(javaPath, "..", ".."));
+            }
+            newCb();
+          });
+        }
+      });
+    }
+    // Find JRE location
+    findByBinary('java', function () {
+      // Find JDK location, can be different
+      findByBinary('javac', function () {
+        cb(discoveredJavaHomes);
+      });
     });
   });
 }
