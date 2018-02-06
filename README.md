@@ -1,6 +1,9 @@
 # locate-java-home v1.0.0
 > Locates `JAVA_HOME` on any platform, and can differentiate between different versions.
 
+[![Build Status](https://travis-ci.org/jvilk/locate-java-home.svg?branch=master)](https://travis-ci.org/jvilk/locate-java-home)
+[![Build status](https://ci.appveyor.com/api/projects/status/575e6s02lbpxnh36/branch/master?svg=true)](https://ci.appveyor.com/project/jvilk/locate-java-home/branch/master)
+
 ## Usage
 
     npm install locate-java-home
