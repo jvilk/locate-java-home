@@ -15,8 +15,10 @@ export default function windowsFindJavaHome(cb: (homes: string[], executableExte
 
   // TODO: Get a proper listing of all JDKs at these locations.
   const keysToCheck: string[] = [
+    `HKLM\\SOFTWARE\\JavaSoft\\JDK`,
     `HKLM\\SOFTWARE\\JavaSoft\\Java Development Kit`,
     `HKLM\\SOFTWARE\\JavaSoft\\Java Runtime Environment`,
+    `HKLM\\SOFTWARE\\Wow6432Node\\JavaSoft\\JDK`,
     `HKLM\\SOFTWARE\\Wow6432Node\\JavaSoft\\Java Development Kit`,
     `HKLM\\SOFTWARE\\Wow6432Node\\JavaSoft\\Java Runtime Environment`
   ];
