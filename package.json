@@ -1,6 +1,6 @@
 {
   "name": "locate-java-home",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "Locates JAVA_HOME on any platform, and can differentiate between different versions.",
   "main": "js/es5/index.js",
   "module": "js/es6/index.js",
@@ -26,15 +26,15 @@
   },
   "homepage": "https://github.com/jvilk/locate-java-home#readme",
   "dependencies": {
-    "async": "^2.6.0",
-    "semver": "^5.5.0"
+    "async": "^2.6.1",
+    "semver": "^5.5.1"
   },
   "devDependencies": {
-    "typescript": "^2.4.1",
-    "@types/mocha": "^2.2.45",
-    "@types/async": "^2.0.47",
+    "typescript": "^3.0.1",
+    "@types/mocha": "^5.2.5",
+    "@types/async": "^2.0.49",
     "@types/semver": "^5.5.0",
-    "mocha": "^3.5.3",
-    "@types/node": "^9.4.0"
+    "mocha": "^5.2.0",
+    "@types/node": "^10.7.1"
   }
 }

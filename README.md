@@ -1,4 +1,4 @@
-# locate-java-home v1.1.1
+# locate-java-home v1.1.2
 > Locates `JAVA_HOME` on any platform, and can differentiate between different versions.
 
 [![Build Status](https://travis-ci.org/jvilk/locate-java-home.svg?branch=master)](https://travis-ci.org/jvilk/locate-java-home)
