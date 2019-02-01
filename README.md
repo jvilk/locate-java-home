@@ -31,7 +31,7 @@ LocateJavaHome({
 
 ## Motivation
 
-I originally wrote this utility for [DoppioJVM](https://github.com/plamsa-umass/doppio),
+I originally wrote this utility for [DoppioJVM](https://github.com/plasma-umass/doppio),
 which requires access to the Java 8 JDK during build time.
 
 I required the following:
