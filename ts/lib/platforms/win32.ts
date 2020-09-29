@@ -6,7 +6,7 @@ interface IKeyInfo {
 }
 
 /**
- * Find Java on Windows by checking registry keys.
+ * Find Java on Windows by checking registry keys and PATH
  */
 export default function windowsFindJavaHome(cb: (homes: string[], executableExtension?: string) => void): void {
   // Windows: JDK path is in either of the following registry keys:
@@ -24,6 +24,13 @@ export default function windowsFindJavaHome(cb: (homes: string[], executableExte
   ];
 
   const discoveredJavaHomes: string[] = [];
+
+  // Option 1: Is JAVA_HOME defined?
+  // (NOTE: locate_java_home will prune redundancies.)
+  if (process.env.JAVA_HOME) {
+    discoveredJavaHomes.push(process.env.JAVA_HOME!);
+  }
+
   eachSeries(keysToCheck, (key: string, asyncCb: (err?: Error) => void) => {
     getRegistryKey(key, (err?: Error | null, values?: IKeyInfo) => {
       if (!err) {
