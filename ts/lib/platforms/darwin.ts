@@ -18,6 +18,13 @@ export default function macFindJavaHome(cb: (homes: string[], executableExtensio
     // Map to paths.
     // TODO: We assume that quotes cannot be in the paths.
     installations = installations.map((install) => install.slice(install.lastIndexOf('"') + 1).trim());
+
+    // Option 2: Is JAVA_HOME defined?
+    // (NOTE: locate_java_home will prune redundancies.)
+    if (process.env.JAVA_HOME) {
+      installations.push(process.env.JAVA_HOME!);
+    }
+
     cb(installations);
   });
 }
