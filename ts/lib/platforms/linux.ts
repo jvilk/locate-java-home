@@ -17,7 +17,7 @@ export default function linuxFindJavaHome(cb: (homes: string[], executableExtens
       const alts = stdout.toString().trim().split('\n');
       for (const alt of alts) {
         // "java-1.7.0-openjdk-amd64 1071 /usr/lib/jvm/java-1.7.0-openjdk-amd64"
-        discoveredJavaHomes.push(alt.split(' ')[2]);
+        discoveredJavaHomes.push(alt.split(/[\s]+/)[2]);
       }
     }
     // Option 2: Is JAVA_HOME defined?
