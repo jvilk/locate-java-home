@@ -54,7 +54,10 @@ describe('API Tests', function() {
       }
       assertEqual(javaHome.security, envData.security);
       assertEqual(javaHome.is64Bit, envData.is64Bit);
-      assertEqual(javaHome.version, envData.version);
+      // restrict version comparison to first 3 decimal places (macOS once reported 11.0.9.1 as envData.version):
+      const envDataVersionComponents = envData.version.split(".");
+      const shortEnvDataVersion = envDataVersionComponents.splice(0, 3).join(".");
+      assertEqual(javaHome.version, shortEnvDataVersion);
     }
   });
   it('Applies a filter correctly', async () => {
