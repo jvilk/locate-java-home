@@ -66,7 +66,7 @@ function locateJavaHome(arg1: any, arg2?: (err: Error | null, found?: IJavaHomeI
           asyncCb();
         }
       });
-    }, (err?: Error) => {
+    }, (err?: Error | null) => {
       var seenPaths: {[path: string]: boolean} = {};
       if (err) {
         cb(err);
