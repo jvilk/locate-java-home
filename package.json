@@ -11,7 +11,7 @@
   },
   "scripts": {
     "prepare": "tsc && tsc -p tsconfig.es6.json && javac -source 1.6 -target 1.6 ts/test/fixtures/EnvironmentTest.java",
-    "test": "mocha js/es5/test --timeout 30000"
+    "test": "npm run prepare && mocha js/es5/test --timeout 30000"
   },
   "bin": {
     "locate-java-home": "./bin/locate-java-home"

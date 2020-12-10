@@ -42,9 +42,11 @@ describe('API Tests', function() {
       const etResult = spawnSync(java, ["-classpath", "ts/test/fixtures", "EnvironmentTest"]);
       const envStr = etResult.stdout.toString().trim();
       const envData: EnvironmentTestOutput = JSON.parse(envStr);
+      // take the version string and try to parse it. Thanks to JS's behavior, '11.0.6' is parsed as 11.
+      const majorJavaVersion = parseInt(javaHome.version);
       // Java 8 and earlier JDKs report a /jre path for java.home.
       // Java 9 changes that. Java 9 also reports its version as 9.0 rather than 1.9.
-      if (javaHome.isJDK && !javaHome.version.startsWith('9')) {
+      if (javaHome.isJDK && majorJavaVersion < 9) {
         // Remove /jre from end of path.
         assertEqual(realpathSync(javaHome.path), realpathSync(resolvePath(envData.path, '..')));
       } else {

@@ -19,7 +19,13 @@ export interface ILocateJavaHomeOptions {
  * (e.g. .exe for Windows).
  */
 export interface ILocateJavaHome {
-  (cb: (homes: string[], executableExtension?: string) => void): void;
+  (): Promise<ILocateJavaHomeResult>
+  // (cb: (homes: string[], executableExtension?: string) => void): void;
+}
+
+export interface ILocateJavaHomeResult {
+  homes: string[],
+  executableExtension?: string
 }
 
 /**

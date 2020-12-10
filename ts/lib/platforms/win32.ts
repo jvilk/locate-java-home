@@ -1,5 +1,7 @@
-import {eachSeries, each as asyncEach} from 'async';
+import {each as asyncEach} from 'async';
 import {spawnSync} from 'child_process';
+import {ILocateJavaHomeResult} from '../interfaces';
+import commonFindJavaHome, {flatten} from './common';
 
 interface IKeyInfo {
   [valName: string]: string | IKeyInfo
@@ -8,7 +10,18 @@ interface IKeyInfo {
 /**
  * Find Java on Windows by checking registry keys and PATH
  */
-export default function windowsFindJavaHome(cb: (homes: string[], executableExtension?: string) => void): void {
+export default function windowsFindJavaHome(): Promise<ILocateJavaHomeResult> {
+  return Promise.all([commonFindJavaHome(), checkRegistryKeys()])
+    .then(res => {
+      // combine the results:
+      return {
+        homes: res[0].homes.concat(res[1].homes),
+        executableExtension: res[1].executableExtension
+      };
+    });
+}
+
+function checkRegistryKeys(): Promise<ILocateJavaHomeResult> {
   // Windows: JDK path is in either of the following registry keys:
   // - HKLM\Software\JavaSoft\Java Development Kit\1.[version] [JDK arch == OS arch]
   // - HKLM\Software\Wow6432Node\JavaSoft\Java Development Kit\1.[version] [32-bit JDK Arch, 64-bit OS arch]
@@ -23,32 +36,41 @@ export default function windowsFindJavaHome(cb: (homes: string[], executableExte
     `HKLM\\SOFTWARE\\Wow6432Node\\JavaSoft\\Java Runtime Environment`
   ];
 
-  const discoveredJavaHomes: string[] = [];
-
-  // Option 1: Is JAVA_HOME defined?
-  // (NOTE: locate_java_home will prune redundancies.)
-  if (process.env.JAVA_HOME) {
-    discoveredJavaHomes.push(process.env.JAVA_HOME!);
-  }
-
-  eachSeries(keysToCheck, (key: string, asyncCb: (err?: Error) => void) => {
-    getRegistryKey(key, (err?: Error | null, values?: IKeyInfo) => {
-      if (!err) {
-        Object.keys(values!).forEach((value) => {
-          const keyInfo = values![value];
-          if (typeof(keyInfo) === 'object' && keyInfo !== null) {
-            // subkey.
-            const javaHome = keyInfo.JavaHome;
-            if (typeof(javaHome) === "string") {
-              discoveredJavaHomes.push(javaHome);
-            }
-          }
-        });
-      }
-      asyncCb();
+  return Promise.all(keysToCheck.map(checkRegistry))
+    .then(flatten)
+    .then(homes => {
+      return {
+        homes: homes, 
+        executableExtension: 'exe'
+      };
     });
-  }, (err?: Error): void => {
-    cb(discoveredJavaHomes, 'exe');
+}
+
+function checkRegistry(key: string): Promise<string[]> {
+  return new Promise(resolve => {
+    getRegistryKey(key, (err?: Error | null, values?: IKeyInfo) => {
+      if (err) {
+        resolve([]);
+      } else {
+        const homes: string[] = flatten(Object.keys(values!)
+          .map((value) => {
+            const keyInfo = values![value];
+            if (typeof(keyInfo) === 'object' && keyInfo !== null) {
+              // subkey.
+              const javaHome = keyInfo.JavaHome;
+              if (typeof(javaHome) === "string") {
+                // we wrap the results in arrays such that we can return an empty array on error
+                // using `flatten`, we recover the one dimensional list of java homes
+                // returning null on error and filter out null values leads to typing issues as 
+                // the type system apparently cannot prove non-nullness of all elements
+                return [javaHome];
+              }
+            }
+            return [];
+          }));
+        resolve(homes);
+      }
+    });
   });
 }
 

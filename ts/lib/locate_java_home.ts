@@ -3,7 +3,7 @@ import {resolve as resolvePath} from 'path';
 import {exec} from 'child_process';
 import {satisfies as semverSatisfies} from 'semver';
 import {each as asyncEach} from 'async';
-import {ILocateJavaHomeOptions, IJavaHomeInfo, ILocateJavaHome} from './interfaces';
+import {ILocateJavaHomeOptions, IJavaHomeInfo, ILocateJavaHome, ILocateJavaHomeResult} from './interfaces';
 import Platform from './platform';
 
 const defaultOptions = {
@@ -47,14 +47,13 @@ function locateJavaHome(arg1: any, arg2?: (err: Error | null, found?: IJavaHomeI
     return cb(new Error(`Unsatisfiable options: A JAVA_HOME cannot be both a JDK and not a JDK.`), []);
   }
 
-  let locateJavaHome: ILocateJavaHome = Platform(process.platform);
-
-  locateJavaHome((homes: string[], executableExtension?: string) => {
+  const locateJavaHome: ILocateJavaHome = Platform(process.platform);
+  locateJavaHome().then((res: ILocateJavaHomeResult) => {
     const homeInfos: IJavaHomeInfo[] = [];
     // NOTE: We don't use async.map here because we want to be error tolerant
     // in case some of the JAVA_HOME locations are erroneous.
-    asyncEach(homes, (home: string, asyncCb: (err?: Error) => void) => {
-      getJavaHomeInfo(home, executableExtension, (err: Error | null, homeInfo?: IJavaHomeInfo) => {
+    asyncEach(res.homes, (home: string, asyncCb: (err?: Error) => void) => {
+      getJavaHomeInfo(home, res.executableExtension, (err: Error | null, homeInfo?: IJavaHomeInfo) => {
         if (!err) {
           // Push the info and continue iteration.
           homeInfos.push(homeInfo!);
