@@ -15,7 +15,7 @@ export default function windowsFindJavaHome(): Promise<ILocateJavaHomeResult> {
     .then(res => {
       // combine the results:
       return {
-        homes: res[0].homes.concat(res[1].homes),
+        homes: res[0].concat(res[1].homes),
         executableExtension: res[1].executableExtension
       };
     });
