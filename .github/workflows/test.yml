@@ -1,0 +1,47 @@
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+#
+# Copyright (c) 2011-2020 ETH Zurich.
+
+name: test
+
+on:
+  push: # run this workflow on every push
+  pull_request: # run this workflow on every pull_request
+
+jobs:
+  setup-and-test:
+    strategy:
+      # tests should not be stopped when they fail on one of the OSes:
+      fail-fast: false
+      matrix:
+        os: [macos-latest, ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+      
+      - name: Install Node.js
+        uses: actions/setup-node@v1.4.4
+        with:
+          node-version: '10'
+      
+      - name: Setup Java JDK
+        uses: actions/setup-java@v1.4.3
+        with:
+          java-version: '11'
+      - run: java --version
+
+      - name: Cache npm
+        uses: actions/cache@v2
+        with:
+          path: .npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - run: npm ci --cache .npm --prefer-offline
+
+      - name: Run tests
+        run: npm test
