@@ -10,7 +10,7 @@
     "url": "git+https://github.com/jvilk/locate-java-home.git"
   },
   "scripts": {
-    "prepare": "tsc && tsc -p tsconfig.es6.json && javac -source 1.6 -target 1.6 ts/test/fixtures/EnvironmentTest.java",
+    "prepare": "tsc && tsc -p tsconfig.es6.json && javac -source 1.7 -target 1.7 ts/test/fixtures/EnvironmentTest.java",
     "test": "npm run prepare && mocha js/es5/test --timeout 30000"
   },
   "bin": {
