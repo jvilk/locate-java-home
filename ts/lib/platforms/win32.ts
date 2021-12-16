@@ -131,6 +131,6 @@ function getRegistryKey(key: string, cb: (err?: Error | null, values?: IKeyInfo)
       cb(err, rv);
     });
   } catch (e) {
-    cb(e);
+    cb(new Error(`exception while getting registry key ${key}: ${e}`));
   }
 }
