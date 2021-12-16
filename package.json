@@ -1,13 +1,13 @@
 {
-  "name": "locate-java-home",
-  "version": "1.1.2",
+  "name": "@viperproject/locate-java-home",
+  "version": "1.1.4",
   "description": "Locates JAVA_HOME on any platform, and can differentiate between different versions.",
   "main": "js/es5/index.js",
   "module": "js/es6/index.js",
   "typings": "js/es5/index",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/jvilk/locate-java-home.git"
+    "url": "git+https://github.com/viperproject/locate-java-home.git"
   },
   "scripts": {
     "prepare": "tsc && tsc -p tsconfig.es6.json && javac -source 1.7 -target 1.7 ts/test/fixtures/EnvironmentTest.java",
@@ -17,14 +17,15 @@
     "locate-java-home": "./bin/locate-java-home"
   },
   "author": {
-    "email": "jvilk@cs.umass.edu",
-    "name": "John Vilk"
+    "name": "Programming Methodology Group, ETH Zürich",
+    "email": "viper@inf.ethz.ch",
+    "url": "https://viper.ethz.ch"
   },
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/jvilk/locate-java-home/issues"
+    "url": "https://github.com/viperproject/locate-java-home/issues"
   },
-  "homepage": "https://github.com/jvilk/locate-java-home#readme",
+  "homepage": "https://github.com/viperproject/locate-java-home#readme",
   "dependencies": {
     "async": "^3.2.0",
     "semver": "^7.3.4"

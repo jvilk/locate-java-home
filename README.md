@@ -1,14 +1,14 @@
-# locate-java-home v1.1.2
+# locate-java-home v1.1.4
 > Locates `JAVA_HOME` on any platform, and can differentiate between different versions.
 
 [![Test Status](https://github.com/viperproject/locate-java-home/workflows/test/badge.svg?branch=master)](https://github.com/viperproject/locate-java-home/actions?query=workflow%3Atest+branch%3Amaster)
 
 ## Usage
 
-    npm install locate-java-home
+    npm install @viperproject/locate-java-home
 
 ```js
-import LocateJavaHome from 'locate-java-home'; // or var ImportJavaHome = require('locate-java-home').default;
+import LocateJavaHome from '@viperproject/locate-java-home'; // or var LocateJavaHome = require('@viperproject/locate-java-home').default;
 LocateJavaHome(function(error, javaHomes) {
    javaHomes.forEach(function(homeInfo) {
       console.log("Found Java " + homeInfo.version + " at " + homeInfo.path);
