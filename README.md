@@ -1,4 +1,4 @@
-# locate-java-home v1.1.5
+# locate-java-home
 > Locates `JAVA_HOME` on any platform, and can differentiate between different versions.
 
 [![Test Status](https://github.com/viperproject/locate-java-home/workflows/test/badge.svg?branch=master)](https://github.com/viperproject/locate-java-home/actions?query=workflow%3Atest+branch%3Amaster)
