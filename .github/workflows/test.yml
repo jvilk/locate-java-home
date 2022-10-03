@@ -45,3 +45,49 @@ jobs:
 
       - name: Run tests
         run: npm test
+
+  release:
+    if: ${{ github.repository == 'viperproject/locate-java-home' && github.ref == 'refs/heads/master' }}
+    needs: setup-and-test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Install Node.js
+        uses: actions/setup-node@v1.4.4
+        with:
+          node-version: '16'
+
+      # compare version in package.json with last published version on
+      # NPM and deploy this version if newer.
+      # credits go to @fpoli!
+      - name: Obtain version information
+        run: |
+          PACKAGE_NAME="$(cat package.json | jq '.name' --raw-output)"
+          LAST_PUBLISHED_VERSION="$(
+            npm show $PACKAGE_NAME version
+          )"
+          CURRENT_VERSION="$(
+            cat package.json | jq '.version' --raw-output
+          )"
+          echo "LAST_PUBLISHED_VERSION=$LAST_PUBLISHED_VERSION" >> $GITHUB_ENV
+          echo "CURRENT_VERSION=$CURRENT_VERSION" >> $GITHUB_ENV
+
+      - name: Cache npm
+        if: ${{ env.CURRENT_VERSION != env.LAST_PUBLISHED_VERSION }}
+        uses: actions/cache@v2
+        with:
+          path: .npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - if: ${{ env.CURRENT_VERSION != env.LAST_PUBLISHED_VERSION }}
+        run: npm ci --cache .npm --prefer-offline
+
+      - name: Release to NPM
+        if: ${{ env.CURRENT_VERSION != env.LAST_PUBLISHED_VERSION }}
+        run: |
+          npm config set -- '//registry.npmjs.org/:_authToken' ${{ secrets.NPM_ACCESS_TOKEN }}
+          npm publish --access public
