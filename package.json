@@ -1,6 +1,6 @@
 {
   "name": "@viperproject/locate-java-home",
-  "version": "1.1.8",
+  "version": "1.1.9",
   "description": "Locates JAVA_HOME on any platform, and can differentiate between different versions.",
   "main": "js/es5/index.js",
   "module": "js/es6/index.js",
