@@ -49,6 +49,7 @@ jobs:
   release:
     if: ${{ github.repository == 'viperproject/locate-java-home' && github.ref == 'refs/heads/master' }}
     needs: setup-and-test
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
