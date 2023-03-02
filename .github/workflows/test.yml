@@ -12,6 +12,7 @@ on:
 
 jobs:
   setup-and-test:
+    name: setup-and-test - ${{ matrix.os }}
     strategy:
       # tests should not be stopped when they fail on one of the OSes:
       fail-fast: false
