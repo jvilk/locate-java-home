@@ -1,6 +1,6 @@
 {
   "name": "@viperproject/locate-java-home",
-  "version": "1.1.13",
+  "version": "1.1.14",
   "description": "Locates JAVA_HOME on any platform, and can differentiate between different versions.",
   "main": "js/es5/index.js",
   "module": "js/es6/index.js",
@@ -27,15 +27,15 @@
   },
   "homepage": "https://github.com/viperproject/locate-java-home#readme",
   "dependencies": {
-    "async": "^3.2.3",
-    "semver": "^7.3.5"
+    "async": "^3.2.5",
+    "semver": "^7.5.4"
   },
   "devDependencies": {
-    "@types/async": "^3.2.12",
-    "@types/mocha": "^10.0.0",
-    "@types/node": "^20.2.5",
-    "@types/semver": "^7.3.9",
-    "mocha": "^10.0.0",
-    "typescript": "^5.0.3"
+    "@types/async": "^3.2.24",
+    "@types/mocha": "^10.0.6",
+    "@types/node": "^20.10.3",
+    "@types/semver": "^7.5.6",
+    "mocha": "^10.2.0",
+    "typescript": "^5.3.2"
   }
 }
